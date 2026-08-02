@@ -1,0 +1,115 @@
+---
+import { Image } from 'astro:assets';
+import { horarios } from '../data/conteudo';
+---
+
+<section class="section horas">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="display display--lg" data-reveal-lines>
+        <span data-reveal-line><span>05h. 22h. 02h.</span></span>
+        <span data-reveal-line><span>Tanto faz.</span></span>
+      </h2>
+      <p class="lede" data-reveal>
+        "24 horas" não é número em cartaz — é poder treinar no horário que a sua vida
+        deixou livre.
+      </p>
+    </div>
+
+    <ul class="horas__grid">
+      {
+        horarios.map((h, i) => (
+          <li class="hora" data-reveal data-reveal-delay={i * 0.1}>
+            <div class="hora__media">
+              <Image src={h.foto} alt={h.titulo} width={900} height={1100} loading="lazy" />
+            </div>
+            <div class="hora__body">
+              <span class="hora__hora">{h.hora}</span>
+              <h3 class="hora__titulo">{h.titulo}</h3>
+              <p class="hora__texto">{h.texto}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .horas__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 800px) {
+    .horas__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .hora {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--hairline);
+    min-height: 22rem;
+    display: grid;
+    align-items: end;
+  }
+
+  .hora__media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hora__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.35) contrast(1.05);
+    transition: transform 900ms var(--ease-out);
+  }
+
+  .hora::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(11, 12, 10, 0.95) 12%,
+      rgba(11, 12, 10, 0.35) 65%,
+      rgba(15, 47, 20, 0.28) 100%
+    );
+  }
+
+  .hora__body {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.45rem;
+    padding: 1.75rem 1.5rem;
+  }
+
+  .hora__hora {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+    color: var(--brand-green);
+  }
+
+  .hora__titulo {
+    font-size: 1.0625rem;
+  }
+
+  .hora__texto {
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    max-width: 30ch;
+  }
+
+  @media (hover: hover) and (min-width: 769px) {
+    .hora:hover .hora__media :global(img) {
+      transform: scale(1.06);
+    }
+  }
+</style>

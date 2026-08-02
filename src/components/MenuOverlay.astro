@@ -1,0 +1,193 @@
+---
+import { navLinksMenu, negocio, whatsappPadrao } from '../data/conteudo';
+---
+
+<div class="menu" data-menu aria-hidden="true">
+  <button class="menu__close" data-menu-toggle aria-label="Fechar menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M6 6l12 12M18 6L6 18"></path>
+    </svg>
+  </button>
+
+  <nav class="menu__nav" aria-label="Menu principal">
+    {
+      navLinksMenu.map((link, i) => (
+        <a href={link.href} data-menu-link style={`--i:${i}`}>
+          <span class="menu__index">0{i + 1}</span>
+          {link.rotulo}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="menu__foot" data-menu-link style={`--i:${navLinksMenu.length}`}>
+    <div class="track-line"></div>
+    <div class="menu__foot-grid">
+      <div>
+        <p class="eyebrow">Aberto 24h</p>
+        <p>
+          {negocio.endereco.rua} — {negocio.endereco.bairro}<br />
+          {negocio.endereco.cidade} – {negocio.endereco.uf}
+        </p>
+      </div>
+      <div>
+        <p class="eyebrow">Contato</p>
+        <p>
+          <a href={whatsappPadrao} target="_blank" rel="noopener">{negocio.telefone}</a><br />
+          <a href={negocio.instagram.url} target="_blank" rel="noopener">
+            {negocio.instagram.handle}
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    align-content: center;
+    gap: 3rem;
+    padding: 6rem var(--gutter) 3rem;
+    background: var(--bg);
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 720ms var(--ease-in-out);
+    pointer-events: none;
+  }
+
+  .menu.is-open {
+    clip-path: inset(0 0 0% 0);
+    pointer-events: auto;
+  }
+
+  .menu__close {
+    position: absolute;
+    top: 1.25rem;
+    right: var(--gutter);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--hairline);
+    border-radius: 50%;
+    color: var(--ink);
+  }
+
+  .menu__close svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .menu__nav {
+    display: grid;
+    gap: 0.25rem;
+    max-width: var(--maxw);
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  .menu__nav a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(2.25rem, 7vw, 5rem);
+    text-transform: uppercase;
+    line-height: 1.05;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .menu__index {
+    font-family: 'Inter Variable', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--brand-green);
+  }
+
+  .menu__foot {
+    max-width: var(--maxw);
+    width: 100%;
+    margin-inline: auto;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .menu__foot-grid {
+    display: grid;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 700px) {
+    .menu__foot-grid {
+      grid-template-columns: repeat(2, minmax(0, 18rem));
+    }
+  }
+
+  [data-menu-link] {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 520ms var(--ease-out),
+      transform 620ms var(--ease-out);
+    transition-delay: calc(var(--i) * 60ms + 180ms);
+  }
+
+  .menu.is-open [data-menu-link] {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: hover) and (min-width: 769px) {
+    .menu__nav a:hover {
+      color: var(--brand-green);
+    }
+    .menu__close:hover {
+      border-color: var(--brand-green);
+      color: var(--brand-green);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu {
+      transition: none;
+    }
+    [data-menu-link] {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { stopScroll, startScroll } from '../scripts/lenis-setup';
+
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const toggles = document.querySelectorAll<HTMLElement>('[data-menu-toggle]');
+  const burger = document.querySelector<HTMLElement>('.header__burger');
+
+  const setOpen = (open: boolean) => {
+    if (!menu) return;
+    menu.classList.toggle('is-open', open);
+    menu.setAttribute('aria-hidden', String(!open));
+    burger?.setAttribute('aria-expanded', String(open));
+    if (open) stopScroll();
+    else startScroll();
+  };
+
+  toggles.forEach((el) =>
+    el.addEventListener('click', () => setOpen(!menu?.classList.contains('is-open')))
+  );
+
+  menu?.querySelectorAll('a').forEach((link) =>
+    link.addEventListener('click', () => setOpen(false))
+  );
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu?.classList.contains('is-open')) setOpen(false);
+  });
+</script>

@@ -1,0 +1,77 @@
+---
+import { marqueeItens } from '../data/conteudo';
+
+// A fita é duplicada para o loop de -50% não ter emenda visível.
+const fita = [...marqueeItens, ...marqueeItens];
+---
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    {
+      fita.map((item) => (
+        <span class:list={['marquee__item', { 'is-24h': item === 'Aberto 24h' }]}>
+          {item}
+          <i>◆</i>
+        </span>
+      ))
+    }
+  </div>
+</div>
+<p class="sr-only">
+  Modalidades: musculação, cross training, personal trainer, dança, espaço kids, yoga,
+  pilates, alongamento, ginástica e avaliação física. Aberto 24 horas.
+</p>
+
+<style>
+  .marquee {
+    position: relative;
+    z-index: 3;
+    overflow: hidden;
+    background: var(--brand-green);
+    color: var(--ink-dark);
+    padding-block: 0.9rem;
+    border-block: 1px solid rgba(11, 12, 10, 0.15);
+  }
+
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee 34s linear infinite;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-right: 1.5rem;
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(1.125rem, 2.2vw, 1.75rem);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .marquee__item i {
+    font-size: 0.5em;
+    font-style: normal;
+    opacity: 0.45;
+  }
+
+  .marquee__item.is-24h {
+    color: var(--bg);
+    -webkit-text-stroke: 1px var(--bg);
+    text-shadow: 0 0 0 var(--bg);
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+</style>

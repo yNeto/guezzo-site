@@ -1,0 +1,183 @@
+---
+import { depoimentos, negocio } from '../data/conteudo';
+---
+
+<section class="section" id="depoimentos">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="display display--lg" data-reveal-lines>
+        <span data-reveal-line><span>Quem treina</span></span>
+        <span data-reveal-line><span>aqui, fala.</span></span>
+      </h2>
+      <div class="nota" data-reveal>
+        <span class="nota__estrelas" aria-hidden="true">★★★★★</span>
+        <p>
+          <b>{negocio.google.nota} no Google</b> — {negocio.google.avaliacoes} avaliações
+        </p>
+      </div>
+    </div>
+
+    <ul class="depos">
+      {
+        depoimentos.map((d, i) => (
+          <li class="depo" data-reveal data-reveal-delay={i * 0.09}>
+            <span class="depo__aspas" aria-hidden="true">
+              “
+            </span>
+            <blockquote>{d.texto}</blockquote>
+            <footer>
+              <strong>{d.autor}</strong>
+              <span>{d.origem}</span>
+            </footer>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a class="insta" href={negocio.instagram.url} target="_blank" rel="noopener" data-reveal>
+      <span class="insta__icone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+          <circle cx="12" cy="12" r="3.6"></circle>
+          <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </span>
+      <span class="insta__texto">
+        <b>Nos siga {negocio.instagram.handle}</b>
+        <small>Treinos, bastidores e novidades todo dia</small>
+      </span>
+      <span class="btn__arrow insta__seta" aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .nota {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  .nota__estrelas {
+    color: var(--brand-green);
+    letter-spacing: 0.1em;
+  }
+
+  .nota b {
+    color: var(--ink);
+  }
+
+  .depos {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 800px) {
+    .depos {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .depo {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    padding: 2rem 1.5rem 1.5rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-card);
+    transition:
+      transform var(--dur-base) var(--ease-out),
+      border-color var(--dur-base) var(--ease-out);
+  }
+
+  .depo__aspas {
+    font-family: 'Anton', sans-serif;
+    font-size: 3.5rem;
+    line-height: 0.5;
+    color: var(--brand-green);
+  }
+
+  .depo blockquote {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .depo footer {
+    display: grid;
+    gap: 0.15rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.8125rem;
+  }
+
+  .depo footer span {
+    color: var(--ink-dim);
+    font-size: 0.75rem;
+  }
+
+  .insta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-card);
+    background: linear-gradient(100deg, rgba(147, 188, 30, 0.14), transparent 60%);
+    transition: border-color var(--dur-base) var(--ease-out);
+  }
+
+  .insta__icone {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--brand-green);
+    color: var(--ink-dark);
+  }
+
+  .insta__icone svg {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .insta__texto {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .insta__texto b {
+    font-size: 1rem;
+  }
+
+  .insta__texto small {
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  .insta__seta {
+    margin-left: auto;
+    color: var(--brand-green);
+    font-size: 1.25rem;
+  }
+
+  @media (hover: hover) and (min-width: 769px) {
+    .depo:hover {
+      transform: translateY(-5px);
+      border-color: rgba(147, 188, 30, 0.5);
+    }
+    .insta:hover {
+      border-color: var(--brand-green);
+    }
+    .insta:hover .insta__seta {
+      transform: translateX(5px);
+    }
+  }
+</style>

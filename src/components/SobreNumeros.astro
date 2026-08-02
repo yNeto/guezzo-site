@@ -1,0 +1,148 @@
+---
+import { stats } from '../data/conteudo';
+---
+
+<section class="section section--light" id="sobre">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="display display--lg" data-reveal-lines>
+        <span data-reveal-line><span>A primeira academia</span></span>
+        <span data-reveal-line><span>24 horas do</span></span>
+        <span data-reveal-line><span>Recôncavo da Bahia.</span></span>
+      </h2>
+      <div class="sobre__texto">
+        <p class="lede" data-reveal>
+          A Guezzo TS Fit Club nasceu em Cruz das Almas com uma ideia simples: academia
+          boa é academia que está aberta quando você pode treinar. Sala climatizada,
+          equipamento novo, dez modalidades e uma equipe que conhece o seu nome.
+        </p>
+        <p class="lede" data-reveal data-reveal-delay="0.1">
+          Sem fila de horário de pico. Sem "volta amanhã". A porta está aberta agora.
+        </p>
+      </div>
+    </div>
+
+    <div class="stats">
+      {
+        stats.map((stat, i) => (
+          <div
+            class:list={['stat', { 'stat--destaque': stat.destaque }]}
+            data-reveal
+            data-reveal-delay={i * 0.08}
+          >
+            {stat.destaque ? (
+              <span class="stat__valor">
+                <svg
+                  class="stat__clock"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path class="stat__hand" d="M12 12V7" />
+                  <path class="stat__hand stat__hand--min" d="M12 12h4" />
+                </svg>
+                {stat.texto}
+              </span>
+            ) : (
+              <span class="stat__valor">
+                <b data-count={stat.valor} data-count-suffix={stat.sufixo ?? ''}>
+                  0
+                </b>
+              </span>
+            )}
+            <p class="stat__rotulo">{stat.rotulo}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .sobre__texto {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--hairline-dark);
+    border: 1px solid var(--hairline-dark);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  @media (min-width: 900px) {
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .stat {
+    display: grid;
+    gap: 0.5rem;
+    padding: 2rem 1.5rem;
+    background: var(--surface-light);
+  }
+
+  .stat--destaque {
+    background: var(--ink-dark);
+    color: var(--ink);
+  }
+
+  .stat__valor {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .stat--destaque .stat__valor {
+    color: var(--brand-green);
+  }
+
+  .stat__clock {
+    width: 1em;
+    height: 1em;
+    flex: 0 0 auto;
+  }
+
+  .stat__hand {
+    transform-origin: 12px 12px;
+    animation: hand-spin 6s linear infinite;
+  }
+
+  .stat__hand--min {
+    animation-duration: 24s;
+  }
+
+  @keyframes hand-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .stat__rotulo {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--ink-dark-soft);
+  }
+
+  .stat--destaque .stat__rotulo {
+    color: var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stat__hand {
+      animation: none;
+    }
+  }
+</style>

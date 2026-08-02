@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Loader from '../components/Loader.astro';
+import Header from '../components/Header.astro';
+import MenuOverlay from '../components/MenuOverlay.astro';
+import Hero from '../components/Hero.astro';
+import MarqueeModalidades from '../components/MarqueeModalidades.astro';
+import SobreNumeros from '../components/SobreNumeros.astro';
+import Modalidades from '../components/Modalidades.astro';
+import HorariosImpossiveis from '../components/HorariosImpossiveis.astro';
+import Estrutura from '../components/Estrutura.astro';
+import Planos from '../components/Planos.astro';
+import Depoimentos from '../components/Depoimentos.astro';
+import Localizacao from '../components/Localizacao.astro';
+import Footer from '../components/Footer.astro';
+import WhatsappButton from '../components/WhatsappButton.astro';
+import ModalMatricula from '../components/ModalMatricula.astro';
+---
+
+<BaseLayout>
+  <Loader />
+  <Header />
+  <MenuOverlay />
+
+  <main>
+    <Hero />
+    <MarqueeModalidades />
+    <SobreNumeros />
+    <Modalidades />
+    <HorariosImpossiveis />
+    <Estrutura />
+    <Planos />
+    <Depoimentos />
+    <Localizacao />
+  </main>
+
+  <Footer />
+  <WhatsappButton />
+  <ModalMatricula />
+</BaseLayout>

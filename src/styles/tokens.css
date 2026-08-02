@@ -1,0 +1,74 @@
+/* ==========================================================================
+   Guezzo TS Fit Club — design tokens
+   Paleta: preto profundo + verde-limão da logo (#93bc1e)
+   ========================================================================== */
+
+:root {
+  /* --- cor --- */
+  --bg: #0b0c0a;
+  --bg-elevated: #141610;
+  --surface-light: #f5f6f1;
+  --ink: #ffffff;
+  --ink-soft: rgba(255, 255, 255, 0.62);
+  --ink-dim: rgba(255, 255, 255, 0.38);
+  --ink-dark: #0b0c0a;
+  --ink-dark-soft: rgba(11, 12, 10, 0.64);
+  --brand-green: #93bc1e;
+  --brand-green-2: #c8e05a;
+  --brand-dark: #0f2f14;
+  --hairline: rgba(255, 255, 255, 0.12);
+  --hairline-dark: rgba(11, 12, 10, 0.14);
+
+  /* --- forma --- */
+  --radius-card: 1.5rem;
+  --radius-lg: 2.5rem;
+  --radius-section: 3rem;
+  --radius-pill: 62.5rem;
+
+  /* --- ritmo --- */
+  --gutter: 1.5rem;
+  --section-y: 6rem;
+  --maxw: 82.5rem;
+
+  /* --- movimento --- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 220ms;
+  --dur-base: 420ms;
+  --dur-slow: 900ms;
+
+  /* --- efeito --- */
+  --glow-green: 0 0 0 0 rgba(147, 188, 30, 0);
+  --glow-green-on: 0 0.75rem 2.5rem -0.5rem rgba(147, 188, 30, 0.55);
+}
+
+/* ==========================================================================
+   Grid adaptativo em rem
+   O rem escala com a viewport: o layout inteiro respira junto com a tela.
+   Acima de 1920px o ajuste fino é feito por JS (BaseLayout).
+   ========================================================================== */
+
+html {
+  font-size: clamp(15px, 4.1vw, 17px);
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: clamp(13px, 1.35vw, 16px);
+  }
+  :root {
+    --gutter: 2.5rem;
+    --section-y: 8rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  html {
+    font-size: clamp(15px, 1vw, 22px);
+  }
+  :root {
+    --gutter: 3rem;
+    --section-y: 10rem;
+    --radius-section: 4rem;
+  }
+}

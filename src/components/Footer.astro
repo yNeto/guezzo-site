@@ -1,0 +1,167 @@
+---
+import { negocio, navLinksMenu, whatsappPadrao } from '../data/conteudo';
+const ano = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="shell">
+    <div class="cta-final">
+      <h2 class="display display--md" data-reveal-lines>
+        <span data-reveal-line><span>Treinar de madrugada? Pode.</span></span>
+        <span data-reveal-line><span>Somos a 1ª academia 24h do Recôncavo.</span></span>
+      </h2>
+      <div class="cta-final__acoes" data-reveal>
+        <button class="btn btn--primary" data-modal-open="Individual">
+          Quero me matricular
+          <span class="btn__arrow" aria-hidden="true">→</span>
+        </button>
+        <a class="btn btn--ghost" href={whatsappPadrao} target="_blank" rel="noopener">
+          Falar no WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <div class="track-line"></div>
+
+    <div class="footer__grid">
+      <div class="footer__marca">
+        <img src="/logo-guezzo.png" alt={negocio.nome} width="360" height="120" />
+        <p>
+          {negocio.endereco.rua} — {negocio.endereco.bairro}<br />
+          {negocio.endereco.cidade} – {negocio.endereco.uf}, {negocio.endereco.cep}
+        </p>
+        <p>
+          <a href={whatsappPadrao} target="_blank" rel="noopener">{negocio.telefone}</a><br />
+          <a href={negocio.instagram.url} target="_blank" rel="noopener">
+            {negocio.instagram.handle}
+          </a>
+        </p>
+      </div>
+
+      <div class="footer__col">
+        <p class="eyebrow">Academia</p>
+        <ul>
+          {navLinksMenu.map((link) => <li><a href={link.href}>{link.rotulo}</a></li>)}
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <p class="eyebrow">Contato</p>
+        <ul>
+          <li><a href={whatsappPadrao} target="_blank" rel="noopener">WhatsApp</a></li>
+          <li><a href={`tel:+${negocio.whatsappNumero}`}>Ligar agora</a></li>
+          <li>
+            <a href={negocio.instagram.url} target="_blank" rel="noopener">Instagram</a>
+          </li>
+          <li><a href={negocio.mapsLink} target="_blank" rel="noopener">Como chegar</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <p class="eyebrow">Funcionamento</p>
+        <ul>
+          <li>{negocio.horario}</li>
+          <li>Gympass e TotalPass aceitos</li>
+          <li>Nota {negocio.google.nota} ★ no Google</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__base">
+      <p>© {ano} {negocio.nome}. Todos os direitos reservados.</p>
+      <p>{negocio.claim}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: var(--section-y) 2rem;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .cta-final {
+    display: grid;
+    gap: 2rem;
+    padding-bottom: 3.5rem;
+  }
+
+  @media (min-width: 1000px) {
+    .cta-final {
+      grid-template-columns: 1.4fr auto;
+      align-items: end;
+      gap: 3rem;
+    }
+  }
+
+  .cta-final h2 {
+    max-width: 22ch;
+  }
+
+  .cta-final__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+  }
+
+  .footer__grid {
+    display: grid;
+    gap: 2.5rem;
+    padding-block: 3rem;
+  }
+
+  @media (min-width: 800px) {
+    .footer__grid {
+      grid-template-columns: 1.5fr repeat(3, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  .footer__marca img {
+    width: 9rem;
+    height: auto;
+    margin-bottom: 1.25rem;
+  }
+
+  .footer__marca p {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 0.75rem;
+  }
+
+  .footer__col ul {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 0.9rem;
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  .footer__col a {
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .footer__base {
+    display: grid;
+    gap: 0.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.75rem;
+    color: var(--ink-dim);
+  }
+
+  @media (min-width: 700px) {
+    .footer__base {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+  }
+
+  @media (hover: hover) and (min-width: 769px) {
+    .footer__col a:hover,
+    .footer__marca a:hover {
+      color: var(--brand-green);
+    }
+  }
+</style>

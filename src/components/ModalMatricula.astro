@@ -1,0 +1,236 @@
+---
+import { planos, diaria } from '../data/conteudo';
+
+const opcoes = [...planos.map((p) => p.nome), diaria.nome, 'Ainda não sei'];
+---
+
+<div
+  class="modal"
+  data-modal
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-titulo"
+>
+  <div class="modal__scrim" data-modal-close></div>
+
+  <div class="modal__painel">
+    <button class="modal__close" data-modal-close aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M6 6l12 12M18 6L6 18"></path>
+      </svg>
+    </button>
+
+    <div class="modal__body">
+      <p class="eyebrow">Matrícula</p>
+      <h2 class="display display--md" id="modal-titulo">Bora treinar.</h2>
+      <p class="modal__lede">
+        Preenche aí que a gente já abre o WhatsApp com a sua mensagem pronta — sem
+        formulário perdido, sem esperar retorno de e-mail.
+      </p>
+
+      <form data-modal-form novalidate>
+        <label class="campo">
+          <span>Seu nome</span>
+          <input id="nome" name="nome" type="text" autocomplete="name" required placeholder="Como podemos te chamar?" />
+        </label>
+
+        <label class="campo">
+          <span>WhatsApp</span>
+          <input
+            id="telefone"
+            name="telefone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="(75) 9 0000-0000"
+          />
+        </label>
+
+        <label class="campo">
+          <span>Plano de interesse</span>
+          <select id="plano" name="plano">
+            {opcoes.map((op) => <option value={op}>{op}</option>)}
+          </select>
+        </label>
+
+        <button class="btn btn--primary btn--block" type="submit">
+          Enviar pelo WhatsApp
+          <span class="btn__arrow" aria-hidden="true">→</span>
+        </button>
+
+        <p class="modal__nota">
+          Não trabalhamos com aula experimental — mas você pode conhecer o espaço a
+          qualquer hora ou começar pela diária de R$ 20.
+        </p>
+      </form>
+    </div>
+
+    <div class="modal__sucesso" aria-hidden="true">
+      <span class="modal__check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M5 12.5l4.5 4.5L19 7.5"></path>
+        </svg>
+      </span>
+      <p>Abrimos o WhatsApp com a sua mensagem. É só apertar enviar!</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+
+  .modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal__scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 7, 5, 0.72);
+    backdrop-filter: blur(6px);
+  }
+
+  .modal__painel {
+    position: relative;
+    width: min(30rem, 100%);
+    max-height: 90svh;
+    overflow-y: auto;
+    padding: 2.25rem 1.75rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
+    transform: translateY(1.5rem) scale(0.98);
+    transition: transform 520ms var(--ease-out);
+  }
+
+  .modal.is-open .modal__painel {
+    transform: none;
+  }
+
+  .modal__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--hairline);
+    border-radius: 50%;
+    color: var(--ink-soft);
+  }
+
+  .modal__close svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .modal__lede {
+    margin: 0.75rem 0 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  form {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .campo {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .campo span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .campo input,
+  .campo select {
+    width: 100%;
+    padding: 0.8rem 0.9rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--hairline);
+    border-radius: 0.75rem;
+    font-size: 0.9375rem;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .campo input::placeholder {
+    color: var(--ink-dim);
+  }
+
+  .campo input:focus,
+  .campo select:focus {
+    border-color: var(--brand-green);
+  }
+
+  .campo select option {
+    background: var(--bg-elevated);
+  }
+
+  .modal__nota {
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    color: var(--ink-dim);
+  }
+
+  /* --- tela de sucesso --- */
+  .modal__sucesso {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    text-align: center;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+
+  .modal.is-sent .modal__sucesso {
+    opacity: 1;
+  }
+
+  .modal__check {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--brand-green);
+    color: var(--ink-dark);
+  }
+
+  .modal__check svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .modal__sucesso p {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    max-width: 24ch;
+  }
+</style>

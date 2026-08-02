@@ -1,0 +1,115 @@
+---
+// Só os subsets que o site usa — evita baixar cirílico, grego e vietnamita.
+import '@fontsource/anton/latin-400.css';
+import '@fontsource/anton/latin-ext-400.css';
+import '@fontsource-variable/inter/wght.css';
+import '../styles/global.css';
+import { negocio } from '../data/conteudo';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${negocio.nome} — 1ª academia 24h do Recôncavo da Bahia | Cruz das Almas`,
+  description = `A primeira academia 24 horas do Recôncavo da Bahia. Musculação, cross training, personal, dança, kids, yoga e pilates em Cruz das Almas – BA. Nota ${negocio.google.nota} no Google.`,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og-image.jpg', Astro.site);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'HealthAndBeautyBusiness',
+  additionalType: 'https://schema.org/ExerciseGym',
+  name: negocio.nome,
+  description,
+  url: canonical.href,
+  image: ogImage.href,
+  telephone: `+55${negocio.whatsappNumero.slice(2)}`,
+  priceRange: 'R$ 20 – R$ 170',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: negocio.endereco.rua,
+    addressLocality: negocio.endereco.cidade,
+    addressRegion: negocio.endereco.uf,
+    postalCode: negocio.endereco.cep,
+    addressCountry: 'BR',
+  },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ],
+    opens: '00:00',
+    closes: '23:59',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: String(negocio.google.avaliacoes),
+  },
+  sameAs: [negocio.instagram.url],
+};
+---
+
+<!doctype html>
+<html lang="pt-BR" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href="/logo-guezzo.png" />
+    <meta name="theme-color" content="#0b0c0a" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content={negocio.nome} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script is:inline>
+      // JS roda: libera os estados iniciais de animação
+      document.documentElement.classList.remove('no-js');
+
+      // Grid adaptativo acima de 1920px (abaixo disso o clamp() do CSS resolve)
+      (function () {
+        var root = document.documentElement;
+        function scale() {
+          if (window.innerWidth > 1920) {
+            root.style.fontSize = Math.min((16 * window.innerWidth) / 1920, 26) + 'px';
+          } else {
+            root.style.fontSize = '';
+          }
+        }
+        scale();
+        window.addEventListener('resize', scale, { passive: true });
+      })();
+    </script>
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <slot />
+
+    <script>
+      import { initAnimations } from '../scripts/animations';
+      import { initModal } from '../scripts/modal';
+
+      initAnimations();
+      initModal();
+    </script>
+  </body>
+</html>

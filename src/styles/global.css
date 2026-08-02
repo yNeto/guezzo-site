@@ -242,9 +242,14 @@ h3 {
   transform: translateY(1.5rem);
 }
 
+/* A caixa da linha precisa ser mais alta que o line-height (0.92), senão o
+   `overflow: hidden` corta ascendente e descendente do Anton. O padding abre
+   espaço para o glifo e a margem negativa devolve o ritmo vertical original. */
 [data-reveal-line] {
   display: block;
   overflow: hidden;
+  padding-block: 0.34em 0.32em;
+  margin-block: -0.34em -0.32em;
 }
 
 [data-reveal-line] > span {

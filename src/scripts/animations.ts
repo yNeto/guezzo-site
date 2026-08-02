@@ -104,6 +104,55 @@ function headerState(): void {
    Boot
    -------------------------------------------------------------------------- */
 
+/**
+ * Rede de segurança contra rAF congelado (aba aberta em segundo plano): o
+ * ScrollTrigger dispara, a tween começa e para no meio, deixando o texto preso
+ * fora da máscara. Passado o prazo, mata a tween pendente e crava o estado
+ * final — sem isso o título fica invisível até a aba receber foco.
+ */
+function failsafeReveal(): void {
+  const cravar = () => {
+    document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
+      if (Number(getComputedStyle(el).opacity) < 0.99) {
+        gsap.killTweensOf(el);
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+        el.style.willChange = 'auto';
+      }
+    });
+
+    document
+      .querySelectorAll<HTMLElement>('[data-reveal-line] > span')
+      .forEach((span) => {
+        // Lê o transform pintado: o yPercent que o GSAP reporta pode já ser 0
+        // enquanto a matriz congelada ainda mantém a linha fora da máscara.
+        const t = getComputedStyle(span).transform;
+        const deslocamento = t === 'none' ? 0 : new DOMMatrixReadOnly(t).m42;
+        if (Math.abs(deslocamento) > 1) {
+          gsap.killTweensOf(span);
+          span.style.transform = 'none';
+          span.style.willChange = 'auto';
+        }
+      });
+
+    // Um contador parado em "0+ seguidores" é pior que não animar nunca
+    document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
+      const alvo = Number(el.dataset.count ?? 0);
+      const sufixo = el.dataset.countSuffix ?? '';
+      const final = alvo.toLocaleString('pt-BR') + sufixo;
+      // A tween anima um objeto intermediário, não o elemento: escrever o texto
+      // basta. Se o rAF voltar, ela retoma e termina no mesmo valor.
+      if (el.textContent !== final) el.textContent = final;
+    });
+  };
+
+  window.setTimeout(cravar, 2600);
+  // Ao voltar para a aba, corrige de imediato o que ficou congelado
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) window.setTimeout(cravar, 1800);
+  });
+}
+
 export function initAnimations(): void {
   document.documentElement.classList.add('js-ready');
 
@@ -130,4 +179,6 @@ export function initAnimations(): void {
 
   // Fontes chegam depois do primeiro paint e mudam a altura dos títulos
   document.fonts?.ready.then(() => ScrollTrigger.refresh());
+
+  failsafeReveal();
 }

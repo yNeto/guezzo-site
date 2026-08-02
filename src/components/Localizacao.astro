@@ -12,7 +12,7 @@ const { endereco } = negocio;
       </h2>
       <p class="lede" data-reveal>
         {endereco.referencia.charAt(0).toUpperCase() + endereco.referencia.slice(1)}. Fácil
-        de chegar a pé, de moto ou de carro — e aberto quando você chegar.
+        de chegar a pé, de moto ou de carro, e aberto quando você chegar.
       </p>
     </div>
 
@@ -22,7 +22,7 @@ const { endereco } = negocio;
           <p class="eyebrow">Endereço</p>
           <p>
             {endereco.rua}<br />
-            {endereco.bairro} — {endereco.cidade} – {endereco.uf}<br />
+            {endereco.bairro}, {endereco.cidade}, {endereco.uf}<br />
             CEP {endereco.cep}
           </p>
         </div>
@@ -50,7 +50,7 @@ const { endereco } = negocio;
       <div class="local__mapa" data-reveal data-reveal-delay="0.1">
         <iframe
           src={negocio.mapsEmbed}
-          title={`Mapa — ${negocio.nome}`}
+          title={`Mapa da ${negocio.nome}`}
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           allowfullscreen></iframe>

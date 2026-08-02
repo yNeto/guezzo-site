@@ -15,6 +15,8 @@ import { planos, diaria, regras } from '../data/conteudo';
       </p>
     </div>
 
+    <p class="planos__dica" data-reveal aria-hidden="true">Arraste para o lado →</p>
+
     <ul class="planos">
       {
         planos.map((plano, i) => (
@@ -81,15 +83,44 @@ import { planos, diaria, regras } from '../data/conteudo';
 </section>
 
 <style>
-  .planos {
-    display: grid;
-    gap: 0.75rem;
-    grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
+  /* Abaixo de 700px: mesmo trilho com swipe/snap da seção de Modalidades — 5
+     cards empilhados verticalmente viram uma rolagem enorme, horizontal cabe
+     na tela e ainda mostra o próximo card espiando na borda. */
+  .planos__dica {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--ink-dark-soft);
   }
 
-  @media (max-width: 560px) {
+  .planos {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    padding-block: 0.75rem 0.25rem;
+  }
+
+  .planos::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 700px) {
+    .planos__dica {
+      display: none;
+    }
     .planos {
-      grid-template-columns: minmax(0, 1fr);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
+      overflow: visible;
+      scroll-snap-type: none;
+      margin-inline: 0;
+      padding-inline: 0;
+      padding-block: 0;
     }
   }
 
@@ -102,10 +133,21 @@ import { planos, diaria, regras } from '../data/conteudo';
     background: #fff;
     border: 1px solid var(--hairline-dark);
     border-radius: var(--radius-card);
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    width: 76%;
+    max-width: 18rem;
     transition:
       transform var(--dur-base) var(--ease-out),
       box-shadow var(--dur-base) var(--ease-out),
       border-color var(--dur-base) var(--ease-out);
+  }
+
+  @media (min-width: 700px) {
+    .plano {
+      width: auto;
+      max-width: none;
+    }
   }
 
   .plano--destaque {

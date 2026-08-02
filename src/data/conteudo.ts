@@ -46,10 +46,15 @@ export const whatsappPadrao = whatsappLink(
 );
 
 /* --------------------------------------------------------------------------
-   Fotos (Pexels — uso comercial livre, sem atribuição obrigatória)
-   Substituir por fotos reais do espaço assim que o cliente enviar.
+   Fotos
    -------------------------------------------------------------------------- */
 
+import fachadaImg from '../assets/estrutura-fachada.jpg';
+import musculacaoImg from '../assets/estrutura-musculacao.jpg';
+import cardioImg from '../assets/estrutura-cardio.jpg';
+
+// Banco Pexels (uso comercial livre, sem atribuição obrigatória): ainda cobre
+// as seções que não têm foto própria do cliente.
 const px = (path: string, w = 1600) =>
   `${path}?auto=compress&cs=tinysrgb&w=${w}`;
 
@@ -71,6 +76,13 @@ export const fotos = {
   kids: px(
     'https://images.pexels.com/photos/26283685/pexels-photo-26283685/free-photo-of-boys-playing-soccer-on-pitch.jpeg'
   ),
+} as const;
+
+/** Fotos reais do espaço, enviadas pelo cliente. */
+export const fotosReais = {
+  fachada: fachadaImg,
+  musculacao: musculacaoImg,
+  cardio: cardioImg,
 } as const;
 
 /* --------------------------------------------------------------------------
@@ -192,19 +204,19 @@ export const horarios = [
 
 export const estrutura = [
   {
+    titulo: 'Nossa fachada',
+    texto: 'Rua Silvestre Mendes, 329, Centro. É só entrar.',
+    foto: fotosReais.fachada,
+  },
+  {
     titulo: 'Sala de musculação',
-    texto: 'Climatizada, equipamento novo e espaço para treinar sem disputa.',
-    foto: fotos.musculacao,
+    texto: 'Equipamento novo, espaço amplo e piso emborrachado.',
+    foto: fotosReais.musculacao,
   },
   {
-    titulo: 'Área de cross training',
-    texto: 'Piso emborrachado, rack e material completo para funcional.',
-    foto: fotos.cross,
-  },
-  {
-    titulo: 'Salas de aula',
-    texto: 'Dança, yoga, pilates e alongamento em ambiente reservado.',
-    foto: fotos.yoga,
+    titulo: 'Cardio e funcional',
+    texto: 'Esteiras, leg press e telas para você não enjoar do treino.',
+    foto: fotosReais.cardio,
   },
 ];
 
@@ -283,7 +295,7 @@ export const planos: Plano[] = [
 export const diaria = {
   nome: 'Diária avulsa',
   preco: 'R$ 20,00',
-  detalhe: 'Passe de um dia único — treine hoje, decida depois.',
+  detalhe: 'Passe de um dia único. Treine hoje e decida depois.',
 };
 
 export const regras = [

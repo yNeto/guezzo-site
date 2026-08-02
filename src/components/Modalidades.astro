@@ -10,9 +10,11 @@ import { modalidades } from '../data/conteudo';
         <span data-reveal-line><span>só lugar.</span></span>
       </h2>
       <p class="lede" data-reveal>
-        Dez modalidades incluídas no plano — troque de treino sem trocar de academia.
+        Dez modalidades incluídas no plano. Troque de treino sem trocar de academia.
       </p>
     </div>
+
+    <p class="mods__dica" data-reveal aria-hidden="true">Arraste para o lado →</p>
 
     <ul class="mods">
       {
@@ -41,15 +43,44 @@ import { modalidades } from '../data/conteudo';
 </section>
 
 <style>
+  /* Abaixo de 700px: trilho horizontal com swipe e snap por cartão — a lista
+     de 8 modalidades não cabe empilhada sem virar um scroll infinito vertical.
+     De 700px em diante volta a ser grade normal, sem scroll próprio. */
+  .mods__dica {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--ink-dim);
+  }
+
   .mods {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
     gap: 0.75rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    padding-bottom: 0.25rem;
+  }
+
+  .mods::-webkit-scrollbar {
+    display: none;
   }
 
   @media (min-width: 700px) {
+    .mods__dica {
+      display: none;
+    }
     .mods {
+      display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
+      overflow: visible;
+      scroll-snap-type: none;
+      margin-inline: 0;
+      padding-inline: 0;
+      padding-bottom: 0;
     }
   }
 
@@ -68,10 +99,21 @@ import { modalidades } from '../data/conteudo';
     background: var(--bg-elevated);
     border: 1px solid var(--hairline);
     border-radius: var(--radius-card);
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    width: 68%;
+    max-width: 16rem;
     transition:
       transform var(--dur-base) var(--ease-out),
       border-color var(--dur-base) var(--ease-out),
       background var(--dur-base) var(--ease-out);
+  }
+
+  @media (min-width: 700px) {
+    .mod {
+      width: auto;
+      max-width: none;
+    }
   }
 
   .mod__icone {

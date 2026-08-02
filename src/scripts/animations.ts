@@ -9,18 +9,29 @@ gsap.registerPlugin(ScrollTrigger);
    -------------------------------------------------------------------------- */
 
 function revealLines(): void {
-  document.querySelectorAll<HTMLElement>('[data-reveal-lines]').forEach((group) => {
-    const spans = group.querySelectorAll<HTMLElement>('[data-reveal-line] > span');
-    if (!spans.length) return;
+  const criar = () => {
+    document.querySelectorAll<HTMLElement>('[data-reveal-lines]').forEach((group) => {
+      const spans = group.querySelectorAll<HTMLElement>('[data-reveal-line] > span');
+      if (!spans.length) return;
 
-    gsap.to(spans, {
-      yPercent: 0,
-      duration: 1.05,
-      ease: 'power4.out',
-      stagger: 0.075,
-      scrollTrigger: { trigger: group, start: 'top 85%', once: true },
+      gsap.to(spans, {
+        yPercent: 0,
+        duration: 1.05,
+        ease: 'power4.out',
+        stagger: 0.075,
+        scrollTrigger: { trigger: group, start: 'top 85%', once: true },
+      });
     });
-  });
+  };
+
+  // As fontes usam font-display:swap e chegam depois do bundle. Se a tween
+  // começar antes, o glifo troca de forma no meio do translateY — a fonte
+  // fallback anima, o Anton estoura por cima no meio do movimento. Espera as
+  // fontes (com teto de 400ms) antes de criar o ScrollTrigger; o título
+  // continua mascarado até lá, então não perde nada visível.
+  const prontas = document.fonts?.ready ?? Promise.resolve();
+  const teto = new Promise<void>((resolve) => setTimeout(resolve, 400));
+  Promise.race([prontas, teto]).then(criar);
 }
 
 function revealBlocks(): void {
@@ -107,12 +118,20 @@ function headerState(): void {
 /**
  * Rede de segurança contra rAF congelado (aba aberta em segundo plano): o
  * ScrollTrigger dispara, a tween começa e para no meio, deixando o texto preso
- * fora da máscara. Passado o prazo, mata a tween pendente e crava o estado
- * final — sem isso o título fica invisível até a aba receber foco.
+ * fora da máscara. Só mexe no que já deveria estar visível pela posição atual
+ * de scroll — nunca em algo abaixo da dobra que o usuário ainda não alcançou,
+ * senão a reserva mata a tween real e o elemento "pula" pronto quando o
+ * ScrollTrigger dele finalmente dispara, sem transição nenhuma.
  */
 function failsafeReveal(): void {
+  const jaDeveriaEstarVisivel = (el: HTMLElement): boolean => {
+    const rect = el.getBoundingClientRect();
+    return rect.top < window.innerHeight && rect.bottom > 0;
+  };
+
   const cravar = () => {
     document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
+      if (!jaDeveriaEstarVisivel(el)) return;
       if (Number(getComputedStyle(el).opacity) < 0.99) {
         gsap.killTweensOf(el);
         el.style.opacity = '1';
@@ -124,6 +143,8 @@ function failsafeReveal(): void {
     document
       .querySelectorAll<HTMLElement>('[data-reveal-line] > span')
       .forEach((span) => {
+        const linha = span.parentElement;
+        if (!linha || !jaDeveriaEstarVisivel(linha)) return;
         // Lê o transform pintado: o yPercent que o GSAP reporta pode já ser 0
         // enquanto a matriz congelada ainda mantém a linha fora da máscara.
         const t = getComputedStyle(span).transform;
@@ -137,6 +158,7 @@ function failsafeReveal(): void {
 
     // Um contador parado em "0+ seguidores" é pior que não animar nunca
     document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
+      if (!jaDeveriaEstarVisivel(el)) return;
       const alvo = Number(el.dataset.count ?? 0);
       const sufixo = el.dataset.countSuffix ?? '';
       const final = alvo.toLocaleString('pt-BR') + sufixo;
@@ -146,10 +168,20 @@ function failsafeReveal(): void {
     });
   };
 
-  window.setTimeout(cravar, 2600);
+  // setInterval roda por fora do rAF: mesmo com a aba em segundo plano (rAF
+  // pausado), continua verificando o que já deveria estar visível conforme o
+  // usuário rola. Para sozinho depois de um tempo para não ficar de vigia pra
+  // sempre.
+  let voltas = 0;
+  const intervalo = window.setInterval(() => {
+    cravar();
+    voltas += 1;
+    if (voltas >= 10) window.clearInterval(intervalo);
+  }, 1500);
+
   // Ao voltar para a aba, corrige de imediato o que ficou congelado
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) window.setTimeout(cravar, 1800);
+    if (!document.hidden) window.setTimeout(cravar, 300);
   });
 }
 

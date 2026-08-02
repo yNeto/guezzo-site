@@ -27,8 +27,8 @@ const ano = new Date().getFullYear();
       <div class="footer__marca">
         <img src="/logo-guezzo.png" alt={negocio.nome} width="360" height="120" />
         <p>
-          {negocio.endereco.rua} — {negocio.endereco.bairro}<br />
-          {negocio.endereco.cidade} – {negocio.endereco.uf}, {negocio.endereco.cep}
+          {negocio.endereco.rua}, {negocio.endereco.bairro}<br />
+          {negocio.endereco.cidade}, {negocio.endereco.uf}, {negocio.endereco.cep}
         </p>
         <p>
           <a href={whatsappPadrao} target="_blank" rel="noopener">{negocio.telefone}</a><br />

@@ -172,12 +172,21 @@ function failsafeReveal(): void {
   // pausado), continua verificando o que já deveria estar visível conforme o
   // usuário rola. Para sozinho depois de um tempo para não ficar de vigia pra
   // sempre.
-  let voltas = 0;
-  const intervalo = window.setInterval(() => {
+  //
+  // A primeira checagem não pode ser cedo demais: o revealLines espera as
+  // fontes (até 400ms) antes de sequer criar a tween, que ainda leva ~1.1s
+  // pra terminar. Menos que ~2s de folga e o failsafe pega a animação real
+  // no meio do caminho e crava o estado final — a linha "aparece" sem
+  // nenhuma transição, mesmo sem rAF congelado.
+  window.setTimeout(() => {
     cravar();
-    voltas += 1;
-    if (voltas >= 10) window.clearInterval(intervalo);
-  }, 1500);
+    let voltas = 1;
+    const intervalo = window.setInterval(() => {
+      cravar();
+      voltas += 1;
+      if (voltas >= 10) window.clearInterval(intervalo);
+    }, 1500);
+  }, 2200);
 
   // Ao voltar para a aba, corrige de imediato o que ficou congelado
   document.addEventListener('visibilitychange', () => {
@@ -201,7 +210,6 @@ export function initAnimations(): void {
   initLenis();
   const lenis = getLenis();
   lenis?.on('scroll', ScrollTrigger.update);
-  ScrollTrigger.defaults({ invalidateOnRefresh: true });
 
   revealLines();
   revealBlocks();
@@ -209,7 +217,13 @@ export function initAnimations(): void {
   parallax();
   headerState();
 
-  // Fontes chegam depois do primeiro paint e mudam a altura dos títulos
+  // Recalcula só os pontos de início/fim de cada trigger (documento mudou de
+  // altura quando a fonte chegou). Sem invalidateOnRefresh: nenhuma tween já
+  // criada é resetada — revealLines() cria a dela só depois que a fonte já
+  // carregou, então não há nada para essa chamada invalidar nela. Com
+  // invalidateOnRefresh ligado, esse refresh corria risco de disparar bem no
+  // instante em que a tween do hero acabava de começar e resetar o progresso
+  // dela, travando a animação sem erro nenhum no console.
   document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
   failsafeReveal();

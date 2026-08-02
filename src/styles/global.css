@@ -242,14 +242,17 @@ h3 {
   transform: translateY(1.5rem);
 }
 
-/* A caixa da linha precisa ser mais alta que o line-height (0.92), senão o
-   `overflow: hidden` corta ascendente e descendente do Anton. O padding abre
-   espaço para o glifo e a margem negativa devolve o ritmo vertical original. */
+/* line-height 0.92 (herdado do heading) é menor que o ascendente+descendente
+   real do Anton — `overflow: hidden` cortava o glifo. Um padding com margem
+   negativa "igual e oposta" parecia resolver isolado, mas em heading de duas
+   linhas as margens de duas [data-reveal-line] irmãs colapsam (regra padrão
+   de blocos adjacentes) e a compensação vira a conta errada, cortando nos
+   dois. Line-height próprio na linha, sem margem nenhuma, não tem esse
+   problema: cada linha carrega sua própria folga, sem depender da vizinha. */
 [data-reveal-line] {
   display: block;
   overflow: hidden;
-  padding-block: 0.34em 0.32em;
-  margin-block: -0.34em -0.32em;
+  line-height: 1.5;
 }
 
 [data-reveal-line] > span {

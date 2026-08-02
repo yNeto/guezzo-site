@@ -5,34 +5,30 @@ import { initLenis, getLenis, prefersReducedMotion } from './lenis-setup';
 gsap.registerPlugin(ScrollTrigger);
 
 /* --------------------------------------------------------------------------
-   Reveals
+   Fontes
    -------------------------------------------------------------------------- */
 
-function revealLines(): void {
-  const criar = () => {
-    document.querySelectorAll<HTMLElement>('[data-reveal-lines]').forEach((group) => {
-      const spans = group.querySelectorAll<HTMLElement>('[data-reveal-line] > span');
-      if (!spans.length) return;
-
-      gsap.to(spans, {
-        yPercent: 0,
-        duration: 1.05,
-        ease: 'power4.out',
-        stagger: 0.075,
-        scrollTrigger: { trigger: group, start: 'top 85%', once: true },
-      });
-    });
-  };
-
-  // As fontes usam font-display:swap e chegam depois do bundle. Se a tween
-  // começar antes, o glifo troca de forma no meio do translateY — a fonte
-  // fallback anima, o Anton estoura por cima no meio do movimento. Espera as
-  // fontes (com teto de 400ms) antes de criar o ScrollTrigger; o título
-  // continua mascarado até lá, então não perde nada visível.
+/**
+ * As fontes usam font-display:swap e chegam depois do bundle. Se um
+ * ScrollTrigger for criado antes delas, a métrica usada pra medir a posição
+ * de start/end é a da fonte fallback — quando o Anton troca, o layout muda
+ * de altura e a posição fica errada. Um `ScrollTrigger.refresh()` corrige
+ * isso, mas se ele rodar bem no instante em que uma tween já começou a
+ * tocar, a remedição pode travar essa tween no meio do progresso (título
+ * trava cortado, só corrigido depois pelo failsafe). Em vez de criar cedo e
+ * corrigir depois com refresh, todo ScrollTrigger espera a mesma fonte
+ * pronta (teto de 400ms) antes de nascer — layout já é o final, nunca
+ * precisa remedir nada no meio de uma animação em andamento.
+ */
+function fontsSettled(): Promise<void> {
   const prontas = document.fonts?.ready ?? Promise.resolve();
   const teto = new Promise<void>((resolve) => setTimeout(resolve, 400));
-  Promise.race([prontas, teto]).then(criar);
+  return Promise.race([prontas, teto]).then(() => undefined);
 }
+
+/* --------------------------------------------------------------------------
+   Reveals
+   -------------------------------------------------------------------------- */
 
 function revealBlocks(): void {
   document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
@@ -46,6 +42,39 @@ function revealBlocks(): void {
       scrollTrigger: { trigger: el, start: 'top 88%', once: true },
     });
   });
+}
+
+/**
+ * Fade+slide via IntersectionObserver + transição CSS, sem GSAP/ScrollTrigger
+ * /Lenis no caminho. Usado em [data-reveal-simple] e [data-reveal-lines] —
+ * pontos onde o [data-reveal] com GSAP não disparava.
+ */
+function observeReveal(selector: string): void {
+  const els = document.querySelectorAll<HTMLElement>(selector);
+  if (!els.length) return;
+
+  els.forEach((el) => {
+    const delay = Number(el.dataset.revealDelay ?? 0);
+    if (delay) el.style.setProperty('--reveal-delay', `${delay}s`);
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0, rootMargin: '0px 0px -12% 0px' }
+  );
+
+  els.forEach((el) => observer.observe(el));
+}
+
+function revealSimple(): void {
+  observeReveal('[data-reveal-simple]');
+  observeReveal('[data-reveal-lines]');
 }
 
 /* --------------------------------------------------------------------------
@@ -140,20 +169,15 @@ function failsafeReveal(): void {
       }
     });
 
+    // [data-reveal-simple] e [data-reveal-lines] usam transição CSS via
+    // IntersectionObserver, não GSAP — não travam no meio (transition não
+    // pausa por rAF congelado), só falta a classe se o observer nunca
+    // disparou (ex: aba já veio restaurada com scroll).
     document
-      .querySelectorAll<HTMLElement>('[data-reveal-line] > span')
-      .forEach((span) => {
-        const linha = span.parentElement;
-        if (!linha || !jaDeveriaEstarVisivel(linha)) return;
-        // Lê o transform pintado: o yPercent que o GSAP reporta pode já ser 0
-        // enquanto a matriz congelada ainda mantém a linha fora da máscara.
-        const t = getComputedStyle(span).transform;
-        const deslocamento = t === 'none' ? 0 : new DOMMatrixReadOnly(t).m42;
-        if (Math.abs(deslocamento) > 1) {
-          gsap.killTweensOf(span);
-          span.style.transform = 'none';
-          span.style.willChange = 'auto';
-        }
+      .querySelectorAll<HTMLElement>('[data-reveal-simple], [data-reveal-lines]')
+      .forEach((el) => {
+        if (!jaDeveriaEstarVisivel(el)) return;
+        el.classList.add('is-visible');
       });
 
     // Um contador parado em "0+ seguidores" é pior que não animar nunca
@@ -173,11 +197,10 @@ function failsafeReveal(): void {
   // usuário rola. Para sozinho depois de um tempo para não ficar de vigia pra
   // sempre.
   //
-  // A primeira checagem não pode ser cedo demais: o revealLines espera as
-  // fontes (até 400ms) antes de sequer criar a tween, que ainda leva ~1.1s
-  // pra terminar. Menos que ~2s de folga e o failsafe pega a animação real
-  // no meio do caminho e crava o estado final — a linha "aparece" sem
-  // nenhuma transição, mesmo sem rAF congelado.
+  // A primeira checagem não pode ser cedo demais: o contador ainda espera a
+  // fonte (até 400ms) antes de começar a tween, que leva 1.8s pra terminar.
+  // Menos que ~2s de folga e o failsafe crava o valor final no meio da
+  // contagem, cortando a animação dele.
   window.setTimeout(() => {
     cravar();
     let voltas = 1;
@@ -211,20 +234,19 @@ export function initAnimations(): void {
   const lenis = getLenis();
   lenis?.on('scroll', ScrollTrigger.update);
 
-  revealLines();
-  revealBlocks();
-  counters();
-  parallax();
   headerState();
 
-  // Recalcula só os pontos de início/fim de cada trigger (documento mudou de
-  // altura quando a fonte chegou). Sem invalidateOnRefresh: nenhuma tween já
-  // criada é resetada — revealLines() cria a dela só depois que a fonte já
-  // carregou, então não há nada para essa chamada invalidar nela. Com
-  // invalidateOnRefresh ligado, esse refresh corria risco de disparar bem no
-  // instante em que a tween do hero acabava de começar e resetar o progresso
-  // dela, travando a animação sem erro nenhum no console.
-  document.fonts?.ready.then(() => ScrollTrigger.refresh());
+  // IntersectionObserver não depende de métrica de fonte, roda já.
+  revealSimple();
+
+  // O que ainda usa ScrollTrigger (blocos, contador, parallax) espera a
+  // fonte pronta (teto 400ms) — evita medir posição em pixel com a métrica
+  // errada da fonte fallback antes do Anton trocar.
+  fontsSettled().then(() => {
+    revealBlocks();
+    counters();
+    parallax();
+  });
 
   failsafeReveal();
 }

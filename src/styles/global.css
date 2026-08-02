@@ -85,7 +85,9 @@ h3 {
   font-family: 'Anton', 'Inter Variable', sans-serif;
   font-weight: 400;
   text-transform: uppercase;
-  line-height: 0.92;
+  /* 0.92 era menor que a caixa real do glifo do Anton — acento (~, ^, ç) de
+     uma linha invadia a de cima em título de duas linhas. */
+  line-height: 1.14;
   letter-spacing: -0.01em;
 }
 
@@ -242,32 +244,43 @@ h3 {
   transform: translateY(1.5rem);
 }
 
-/* line-height 0.92 (herdado do heading) é menor que o ascendente+descendente
-   real do Anton — `overflow: hidden` cortava o glifo. Um padding com margem
-   negativa "igual e oposta" parecia resolver isolado, mas em heading de duas
-   linhas as margens de duas [data-reveal-line] irmãs colapsam (regra padrão
-   de blocos adjacentes) e a compensação vira a conta errada, cortando nos
-   dois. Line-height próprio na linha, sem margem nenhuma, não tem esse
-   problema: cada linha carrega sua própria folga, sem depender da vizinha. */
+/* [data-reveal-simple] e [data-reveal-lines]: fade+slide via CSS transition +
+   IntersectionObserver, sem GSAP/ScrollTrigger/Lenis no caminho (ver
+   animations.ts). Usado onde o [data-reveal] com GSAP não estava disparando. */
+[data-reveal-simple],
+[data-reveal-lines] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+[data-reveal-simple].is-visible,
+[data-reveal-lines].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 [data-reveal-line] {
   display: block;
-  overflow: hidden;
-  line-height: 1.5;
 }
 
 [data-reveal-line] > span {
   display: block;
-  transform: translateY(105%);
 }
 
 .js-ready [data-reveal],
-.js-ready [data-reveal-line] > span {
+.js-ready [data-reveal-simple],
+.js-ready [data-reveal-lines] {
   will-change: transform, opacity;
 }
 
 /* Sem JS ou com movimento reduzido: tudo visível */
 .no-js [data-reveal],
-.no-js [data-reveal-line] > span {
+.no-js [data-reveal-simple],
+.no-js [data-reveal-lines] {
   opacity: 1;
   transform: none;
 }
@@ -282,7 +295,8 @@ h3 {
     scroll-behavior: auto !important;
   }
   [data-reveal],
-  [data-reveal-line] > span {
+  [data-reveal-simple],
+  [data-reveal-lines] {
     opacity: 1 !important;
     transform: none !important;
   }
